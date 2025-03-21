@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
-import { Repository, UpdateResult } from 'typeorm';
 
 const relations = [
   'userCreator',
@@ -21,12 +21,8 @@ export class TasksService {
 
   async create(createDataTask: CreateTaskDto): Promise<Task> {
     try {
-      let resTaskCreate;
-      for (const fk_user of createDataTask.fk_users) {
-        createDataTask.fk_user_responsible = fk_user;
-        resTaskCreate = await this.taskRepository.save(createDataTask);
-      }
-      return resTaskCreate;
+      createDataTask.fk_user_responsible = createDataTask.fk_user_creator;
+      return await this.taskRepository.save(createDataTask);
     } catch (err) {
       throw new HttpException(`${err.sqlMessage}, Error al crear tarea`, HttpStatus.BAD_REQUEST);
     }

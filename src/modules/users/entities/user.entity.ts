@@ -1,7 +1,7 @@
 import { Project } from "src/modules/projects/entities/project.entity";
 import { Role } from "src/modules/roles/entities/role.entity";
 import { Task } from "src/modules/tasks/entities/task.entity";
-import { Collection, Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('users')
 export class User {
@@ -16,6 +16,9 @@ export class User {
 
     @Column()
     n_email: string;
+
+    @Column()
+    i_active: boolean;
 
     @Column()
     n_password: string;
