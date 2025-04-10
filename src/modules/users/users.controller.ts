@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@n
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @UseGuards(JwtAuthGuard)
@@ -22,6 +23,11 @@ export class UsersController {
   @Get('/calendar')
   findAllWithourRelations() {
     return this.usersService.findAllWithOutRelations();
+  }
+
+  @Get('/no-active')
+  findAllNoActive(): Promise<User[]> {
+    return this.usersService.findAllNoActive();
   }
 
   @Get(':id')

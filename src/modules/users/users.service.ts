@@ -56,6 +56,10 @@ export class UsersService {
     return await this.userRepository.find({ where: { i_active: true }, relations });
   }
 
+  async findAllNoActive(): Promise<User[]> {
+    return await this.userRepository.find({ where: { i_active: false }, relations });
+  }
+
   async findAllWithOutRelations(): Promise<User[]> {
     const response = await this.userRepository.find({ where: { i_active: true }, relations: ['role'] });
 
