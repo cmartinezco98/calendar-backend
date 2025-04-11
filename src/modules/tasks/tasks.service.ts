@@ -49,6 +49,14 @@ export class TasksService {
     return resTasks;
   }
 
+  /**
+   * Get taks by project order by fk_project asc
+   * @returns Promise<Task[]>
+   */
+  async findAllOrderProject(): Promise<Task[]> {
+    return await this.taskRepository.find({ relations, order: { fk_project: 'ASC' } });
+  }
+
   async findOne(k_task: number): Promise<Task> {
     const resTask = await this.taskRepository.findOne({ where: { k_task }, relations });
     if (!resTask) throw new HttpException(`No se encuentra tarea con el ID ${k_task}`, HttpStatus.NOT_FOUND);

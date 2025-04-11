@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { TasksService } from './tasks.service';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Task } from './entities/task.entity';
+import { TasksService } from './tasks.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('tasks')
@@ -27,6 +28,11 @@ export class TasksController {
   @Get('project/:idProject')
   findAllByProject(@Param('idProject') idProject: number) {
     return this.tasksService.findAllByProject(idProject)
+  }
+
+  @Get('projects')
+  findAllOrderProject(): Promise<Task[]> {
+    return this.tasksService.findAllOrderProject();
   }
 
   @Get(':id')
