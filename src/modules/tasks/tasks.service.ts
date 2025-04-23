@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Between, Repository, UpdateResult } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
@@ -10,6 +10,17 @@ const relations = [
   'userResponsible',
   'taskStatus',
   'project'
+];
+
+const relationsExport = [
+  'userCreator',
+  'userResponsible',
+  'taskStatus',
+  'project',
+  'project.type',
+  'project.departments',
+  'project.departments.deparment',
+  'project.client'
 ];
 
 @Injectable()
@@ -53,8 +64,37 @@ export class TasksService {
    * Get taks by project order by fk_project asc
    * @returns Promise<Task[]>
    */
-  async findAllOrderProject(): Promise<Task[]> {
-    return await this.taskRepository.find({ relations, order: { fk_project: 'ASC' } });
+  async findAllOrderProject(date: { date_start: Date, date_finish: Date }): Promise<Task[]> {
+    if (date.date_start && date.date_finish) {
+      let dateStart = new Date(date.date_start);
+      let dateFinish = new Date(date.date_finish);
+
+      dateStart.setUTCHours(0, 0, 0, 0);
+      dateFinish.setUTCHours(23, 59, 59, 999);
+
+      return await this.taskRepository.find({
+        relations: relationsExport, order: { fk_project: 'ASC' }, where: {
+          f_start: Between(dateStart.toISOString(), dateFinish.toISOString()),
+          f_end: Between(dateStart.toISOString(), dateFinish.toISOString()),
+        }
+      });
+    } else if (date.date_start) {
+      let dateStart = new Date(date.date_start);
+      let dateFinish = new Date(date.date_start);
+
+      dateStart.setUTCHours(0, 0, 0, 0);
+      dateFinish.setUTCHours(23, 59, 59, 999);
+      return await this.taskRepository.find({
+        relations: relationsExport, order: { fk_project: 'ASC' }, where: {
+          f_start: Between(dateStart.toISOString(), dateFinish.toISOString()),
+          f_end: Between(dateStart.toISOString(), dateFinish.toISOString()),
+        }
+      });
+    } else {
+      return await this.taskRepository.find({
+        relations: relationsExport, order: { fk_project: 'ASC' }
+      });
+    }
   }
 
   async findOne(k_task: number): Promise<Task> {

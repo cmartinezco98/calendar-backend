@@ -30,9 +30,9 @@ export class TasksController {
     return this.tasksService.findAllByProject(idProject)
   }
 
-  @Get('projects')
-  findAllOrderProject(): Promise<Task[]> {
-    return this.tasksService.findAllOrderProject();
+  @Post('projects')
+  findAllOrderProject(@Body() date: any): Promise<Task[]> {
+    return this.tasksService.findAllOrderProject(date);
   }
 
   @Get(':id')
