@@ -23,7 +23,8 @@ import { ProjectsProjectDeparmentsModule } from './modules/projects-project-depa
     database: 'calendar',
     multipleStatements: true,
     entities: [],
-    autoLoadEntities: true
+    autoLoadEntities: true,
+    timezone: 'Z'
   }), ClientsModule, ProjectsModule, RolesModule, TaskStatusModule, TasksModule, MailModule, ProjectDepartmentsModule, ProjectTypesModule, ProjectsProjectDeparmentsModule],
   controllers: [AppController],
   providers: [AppService],
