@@ -24,7 +24,7 @@ import { ProjectsProjectDeparmentsModule } from './modules/projects-project-depa
     multipleStatements: true,
     entities: [],
     autoLoadEntities: true,
-    timezone: 'Z'
+    timezone: 'America/Bogota'
   }), ClientsModule, ProjectsModule, RolesModule, TaskStatusModule, TasksModule, MailModule, ProjectDepartmentsModule, ProjectTypesModule, ProjectsProjectDeparmentsModule],
   controllers: [AppController],
   providers: [AppService],
