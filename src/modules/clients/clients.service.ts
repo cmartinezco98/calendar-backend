@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
+import { CreateClientDto } from './dto/create-client.dto';
+import { UpdateClientDto } from './dto/update-client.dto';
 import { Client } from './entities/client.entity';
 
 const relations = [
@@ -57,12 +57,22 @@ export class ClientsService {
       };
       const resDelete = await this.clientRepository.delete(k_client);
       if (resDelete.affected == 0) {
-        res.message = "No fue posible eliminar"
+        res.message = "No se encontró el cliente para eliminar"
         res.status = false;
       }
       return res;
     } catch (err) {
-      throw new HttpException(`${err.sqlMessage}, Error al borrar cliente`, HttpStatus.BAD_REQUEST);
+      if (err.errno === 1451 || err.code === 'ER_ROW_IS_REFERENCED_2') {
+        throw new HttpException(
+          'No se puede eliminar el cliente porque tiene proyectos asociados.',
+          HttpStatus.CONFLICT
+        );
+      }
+
+      throw new HttpException(
+        `Error al borrar cliente: ${err.sqlMessage || err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 }

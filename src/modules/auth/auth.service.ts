@@ -1,15 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
 import { compare, hash } from 'bcrypt';
+import { Repository } from 'typeorm';
+import { Role } from '../roles/entities/role.entity';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { Role } from '../roles/entities/role.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtTokenService: JwtService, private usersService: UsersService) { }
+
+  constructor(
+    private jwtTokenService: JwtService,
+    private usersService: UsersService,
+    @InjectRepository(User) private userRepository: Repository<User>
+  ) { }
 
   private data: LoginAuthDto = {
     token: "",
@@ -41,13 +48,14 @@ export class AuthService {
   }
 
   async authLogin({ n_email, n_password }: LoginAuthDto): Promise<object> {
-    const resUser: User = await this.usersService.findOneByEmail(n_email);
+    const resUser: User = await this.userRepository.findOne({ where: { n_email, i_active: true }, relations: ['role'] });
+
     if (resUser) {
       const match = await compare(n_password, resUser.n_password);
-      if (resUser.n_email == n_email && match) {
-        this.JWTGenerator(resUser);
-      } else { throw new HttpException('Usuario o contraseña incorrecta', HttpStatus.BAD_REQUEST); }
-    } else { throw new HttpException('Usuario o contraseña incorrecta', HttpStatus.NOT_FOUND); }
+
+      if (match) this.JWTGenerator(resUser);
+      else throw new HttpException('Usuario o contraseña incorrecta', HttpStatus.BAD_REQUEST);
+    } else throw new HttpException('Usuario o contraseña incorrecta', HttpStatus.BAD_REQUEST);
     return this.data;
   }
 }
